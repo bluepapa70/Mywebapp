@@ -1,0 +1,1034 @@
+<!-- 웹앱 프로젝트 링크를 카드 형태로 관리하는 포트폴리오 대시보드 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bluepapa's Vibecoding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #22263a;
+      --accent:    #6366f1;
+      --accent-h:  #818cf8;
+      --danger:    #ef4444;
+      --text:      #e2e8f0;
+      --text-muted:#94a3b8;
+      --border:    #2d3147;
+      --radius:    12px;
+      --shadow:    0 4px 24px rgba(0,0,0,.4);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: .3px;
+      color: var(--accent-h);
+    }
+
+    .logo span { color: var(--text-muted); font-weight: 400; font-size: .85rem; margin-left: .5rem; }
+
+    .btn-add {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: .5rem 1.1rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-add:hover { background: var(--accent-h); }
+    .btn-add svg { width: 16px; height: 16px; }
+
+    /* ── Main ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .section-title {
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Card Grid ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+    .empty-state svg { width: 56px; height: 56px; opacity: .35; margin-bottom: 1rem; }
+    .empty-state p { font-size: 1rem; }
+    .empty-state small { font-size: .85rem; opacity: .7; }
+
+    /* ── Project Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      transition: border-color .2s, transform .15s;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .card-url {
+      font-size: .75rem;
+      color: var(--accent-h);
+      word-break: break-all;
+      opacity: .8;
+    }
+
+    .card-desc {
+      font-size: .85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .card-footer {
+      display: flex;
+      gap: .5rem;
+      margin-top: .4rem;
+    }
+
+    .btn-goto {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: .45rem .75rem;
+      border-radius: 7px;
+      font-size: .83rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background .2s;
+    }
+    .btn-goto:hover { background: var(--accent-h); }
+
+    .btn-edit, .btn-del {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: .45rem .7rem;
+      border-radius: 7px;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .btn-edit:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-del:hover  { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    /* ── Modal Overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow);
+      animation: slide-in .2s ease;
+    }
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.4rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+    .form-group label { font-size: .82rem; color: var(--text-muted); font-weight: 500; }
+    .form-group input,
+    .form-group textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: .6rem .85rem;
+      font-size: .9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 80px; }
+
+    .form-error {
+      font-size: .78rem;
+      color: var(--danger);
+      min-height: 1rem;
+      margin-top: -.3rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: .6rem;
+      margin-top: 1.4rem;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: .5rem 1.1rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-cancel:hover { background: var(--surface2); }
+
+    .btn-save {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: .5rem 1.3rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-save:hover { background: var(--accent-h); }
+
+    /* ── Confirm Dialog ── */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+    }
+    .confirm-overlay.open { display: flex; }
+
+    .confirm-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 340px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .confirm-box p { margin-bottom: .4rem; font-weight: 600; }
+    .confirm-box small { color: var(--text-muted); font-size: .83rem; }
+    .confirm-actions {
+      display: flex;
+      justify-content: center;
+      gap: .7rem;
+      margin-top: 1.3rem;
+    }
+    .btn-confirm-del {
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      padding: .5rem 1.2rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Cloudflare 연동 ── */
+    .header-right { display: flex; align-items: center; gap: .5rem; }
+
+    .btn-cf {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: .5rem .9rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-cf svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .btn-cf:hover { border-color: #f6821f; color: #f6821f; }
+    .btn-cf.connected { border-color: rgba(246,130,31,.5); color: #f6821f; }
+
+    .btn-sync {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: .25rem .75rem;
+      border-radius: 6px;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-sync:hover:not(:disabled) { color: var(--text); border-color: #f6821f; }
+    .btn-sync:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-sync.spinning svg { animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .sync-bar {
+      display: none;
+      align-items: center;
+      gap: .65rem;
+      margin-bottom: 1.1rem;
+      padding: .55rem .85rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .sync-bar.visible { display: flex; }
+    .sync-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0;
+    }
+    .sync-dot.error { background: var(--danger); }
+    .sync-dot.loading { background: #f6821f; animation: pulse .9s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .sync-info { font-size: .78rem; color: var(--text-muted); flex: 1; }
+
+    .cf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .2rem;
+      font-size: .68rem;
+      font-weight: 600;
+      color: #f6821f;
+      background: rgba(246,130,31,.1);
+      border: 1px solid rgba(246,130,31,.25);
+      border-radius: 4px;
+      padding: .1rem .38rem;
+      line-height: 1.4;
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: .5rem 1rem;
+      border-radius: 8px;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: background .2s;
+      margin-right: auto;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,.1); }
+    #btnCfDisconnect { display: none; }
+    #btnCfDisconnect.visible { display: block; }
+
+    .form-hint {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+      line-height: 1.55;
+      padding: .7rem .9rem;
+      background: var(--surface2);
+      border-radius: 8px;
+      border-left: 3px solid #f6821f;
+    }
+    .form-hint a { color: #f6821f; text-decoration: none; }
+    .form-hint a:hover { text-decoration: underline; }
+
+    .form-hint code { font-size:.78rem; background:var(--bg); padding:.1rem .4rem; border-radius:4px; }
+
+    /* ── Drop Overlay ── */
+    .drop-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: rgba(99, 102, 241, .12);
+      border: 3px dashed var(--accent);
+      border-radius: 0;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: .75rem;
+      color: var(--accent-h);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .drop-overlay.active { display: flex; }
+    .drop-overlay svg { width: 56px; height: 56px; opacity: .8; }
+    .drop-overlay small { font-size: .9rem; font-weight: 400; color: var(--text-muted); }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      header { padding: 0 1rem; }
+      .logo span { display: none; }
+      main { padding: 1.2rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Drop Overlay ── -->
+<div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 3v12m0 0-4-4m4 4 4-4"/>
+    <path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/>
+  </svg>
+  URL을 여기에 놓으세요
+  <small>브라우저 주소창 또는 링크를 드래그하여 카드를 추가합니다.</small>
+</div>
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">
+    Bluepapa's Vibecoding
+  </div>
+  <div class="header-right">
+    <button class="btn-cf" id="btnCfSettings">
+      <!-- Cloudflare 로고 색상 아이콘 -->
+      <svg viewBox="0 0 32 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21.44 14.56c.18-.62.11-1.19-.2-1.61-.28-.39-.74-.61-1.27-.64l-10.54-.14a.18.18 0 0 1-.16-.1.19.19 0 0 1 .02-.19c.07-.1.18-.16.3-.17l10.65-.14c1.26-.06 2.63-1.08 3.11-2.32l.61-1.59a.32.32 0 0 0 .02-.2A8.01 8.01 0 0 0 8.6 9.03a3.67 3.67 0 0 0-3.44-.34 3.7 3.7 0 0 0-2.22 2.6 4.44 4.44 0 0 0 .25 8.84l17.67.14c1.14-.01 2.12-.77 2.45-1.87l.13-.84z" fill="#f6821f"/>
+        <path d="M24.76 8.27c-.13 0-.26 0-.39.01a5.35 5.35 0 0 0-9.34-1.65 3.2 3.2 0 0 0-1.58-.42 3.23 3.23 0 0 0-3.06 2.2 4.44 4.44 0 0 0 .69 8.83h13.68a4.49 4.49 0 0 0 0-8.97z" fill="#fbad41"/>
+      </svg>
+      <span id="cfConnectLabel">Cloudflare 연동</span>
+    </button>
+    <button class="btn-add" id="btnOpenAdd">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      프로젝트 추가
+    </button>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<main>
+  <!-- Cloudflare 동기화 상태 바 -->
+  <div class="sync-bar" id="syncBar">
+    <span class="sync-dot" id="syncDot"></span>
+    <span class="sync-info" id="syncInfo">Cloudflare Pages 연동됨</span>
+    <button class="btn-sync" id="btnSync">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5"/>
+        <path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      동기화
+    </button>
+  </div>
+  <p class="section-title" id="cardCount">프로젝트 0개</p>
+  <div class="card-grid" id="cardGrid"></div>
+</main>
+
+<!-- ── Add / Edit Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <p class="modal-title" id="modalTitle">프로젝트 추가</p>
+
+    <div class="form-group">
+      <label for="inputName">프로젝트 이름 *</label>
+      <input type="text" id="inputName" placeholder="예) 날씨 대시보드" maxlength="60" />
+      <span class="form-error" id="errName"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="inputDesc">설명</label>
+      <textarea id="inputDesc" placeholder="어떤 앱인지 간단히 설명해주세요." maxlength="200"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="inputUrl">URL *</label>
+      <input type="url" id="inputUrl" placeholder="https://example.com" />
+      <span class="form-error" id="errUrl"></span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCancel">취소</button>
+      <button class="btn-save"   id="btnSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Cloudflare 설정 모달 ── -->
+<div class="modal-overlay" id="cfModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <p class="modal-title">Cloudflare Pages 연동</p>
+    <p class="form-hint">
+      <strong>Account ID</strong>: Cloudflare 대시보드 접속 후 URL에서 확인하세요.<br>
+      <code>https://dash.cloudflare.com/<strong>[Account ID]</strong>/workers-and-pages</code><br><br>
+      <strong>API Token</strong>: <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener">My Profile → API Tokens</a>에서
+      <strong>Custom token</strong>으로 생성 — 권한: <strong>Cloudflare Pages: Read</strong>
+      + <strong>Account: Read</strong> (Account ID 자동 감지용)
+    </p>
+    <div class="form-group">
+      <label for="cfAccountId">Account ID</label>
+      <input type="text" id="cfAccountId" placeholder="32자리 Account ID" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label for="cfApiToken">API Token</label>
+      <input type="password" id="cfApiToken" placeholder="Bearer Token" autocomplete="off" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-danger" id="btnCfDisconnect">연동 해제</button>
+      <button class="btn-cancel" id="btnCfCancel">취소</button>
+      <button class="btn-save" id="btnCfSave">저장 및 동기화</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Confirm ── -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p>정말 삭제할까요?</p>
+    <small id="confirmName">이 프로젝트 카드가 목록에서 제거됩니다.</small>
+    <div class="confirm-actions">
+      <button class="btn-cancel" id="btnConfirmCancel">취소</button>
+      <button class="btn-confirm-del" id="btnConfirmDel">삭제</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 웹앱 포트폴리오 CRUD + LocalStorage 관리 스크립트
+
+const STORAGE_KEY = 'webapp_projects';
+
+// ── 아이콘 팔레트 (URL 앞글자 기반 이모지) ──
+const ICONS = ['🌐','⚡','🔧','🎨','📊','🚀','🛠','💡','🔮','🌟','🔑','📱'];
+
+function getIcon(name) {
+  const code = [...name].reduce((s, c) => s + c.charCodeAt(0), 0);
+  return ICONS[code % ICONS.length];
+}
+
+// ── Storage ──
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+
+function save(projects) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+}
+
+// ── Render ──
+function render() {
+  const projects = load();
+  const grid = document.getElementById('cardGrid');
+  const count = document.getElementById('cardCount');
+
+  count.textContent = `프로젝트 ${projects.length}개`;
+  grid.innerHTML = '';
+
+  if (projects.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <path d="M12 8v8M8 12h8"/>
+        </svg>
+        <p>등록된 프로젝트가 없습니다.</p>
+        <small>상단 '프로젝트 추가' 버튼으로 첫 카드를 만들어보세요.</small>
+      </div>`;
+    return;
+  }
+
+  projects.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const cfBadge = p.source === 'cloudflare'
+      ? '<span class="cf-badge">&#9729; CF Pages</span>'
+      : '';
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon">${getIcon(p.name)}</div>
+        <div>
+          <div class="card-title">${escHtml(p.name)}${cfBadge ? ' ' + cfBadge : ''}</div>
+          <div class="card-url">${escHtml(trimUrl(p.url))}</div>
+        </div>
+      </div>
+      ${p.desc ? `<div class="card-desc">${escHtml(p.desc)}</div>` : ''}
+      <div class="card-footer">
+        <a class="btn-goto" href="${escAttr(p.url)}" target="_blank" rel="noopener noreferrer">바로가기 ↗</a>
+        <button class="btn-edit" data-id="${p.id}">수정</button>
+        <button class="btn-del"  data-id="${p.id}">삭제</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escAttr(url) {
+  // URL 검증: http/https 허용
+  try {
+    const u = new URL(url);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return '#';
+  } catch { return '#'; }
+  return escHtml(url);
+}
+
+function trimUrl(url) {
+  try { const u = new URL(url); return u.hostname + (u.pathname !== '/' ? u.pathname : ''); }
+  catch { return url; }
+}
+
+// ── Modal 상태 ──
+let editingId = null;
+
+function openModal(project = null) {
+  editingId = project ? project.id : null;
+  document.getElementById('modalTitle').textContent = project ? '프로젝트 수정' : '프로젝트 추가';
+  document.getElementById('inputName').value = project ? project.name : '';
+  document.getElementById('inputDesc').value = project ? project.desc : '';
+  document.getElementById('inputUrl').value  = project ? project.url  : '';
+  clearErrors();
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('inputName').focus();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+}
+
+function clearErrors() {
+  document.getElementById('errName').textContent = '';
+  document.getElementById('errUrl').textContent  = '';
+}
+
+// ── Validate ──
+function validate(name, url) {
+  let ok = true;
+  if (!name.trim()) {
+    document.getElementById('errName').textContent = '이름을 입력하세요.';
+    ok = false;
+  }
+  if (!url.trim()) {
+    document.getElementById('errUrl').textContent = 'URL을 입력하세요.';
+    ok = false;
+  } else {
+    try {
+      const u = new URL(url.trim());
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+        document.getElementById('errUrl').textContent = 'http:// 또는 https:// 로 시작하는 URL을 입력하세요.';
+        ok = false;
+      }
+    } catch {
+      document.getElementById('errUrl').textContent = '올바른 URL 형식이 아닙니다.';
+      ok = false;
+    }
+  }
+  return ok;
+}
+
+// ── Save (Create / Update) ──
+function saveProject() {
+  const name = document.getElementById('inputName').value.trim();
+  const desc = document.getElementById('inputDesc').value.trim();
+  const url  = document.getElementById('inputUrl').value.trim();
+
+  clearErrors();
+  if (!validate(name, url)) return;
+
+  const projects = load();
+
+  if (editingId) {
+    const idx = projects.findIndex(p => p.id === editingId);
+    if (idx !== -1) { projects[idx].name = name; projects[idx].desc = desc; projects[idx].url = url; }
+  } else {
+    projects.push({ id: crypto.randomUUID(), name, desc, url, createdAt: Date.now() });
+  }
+
+  save(projects);
+  closeModal();
+  render();
+}
+
+// ── Delete Confirm ──
+let deletingId = null;
+
+function openConfirm(id) {
+  deletingId = id;
+  const p = load().find(x => x.id === id);
+  document.getElementById('confirmName').textContent =
+    p ? `"${p.name}" 카드가 목록에서 제거됩니다.` : '이 프로젝트 카드가 목록에서 제거됩니다.';
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  deletingId = null;
+}
+
+function deleteProject() {
+  if (!deletingId) return;
+  const projects = load().filter(p => p.id !== deletingId);
+  save(projects);
+  closeConfirm();
+  render();
+}
+
+// ── Event Wiring ──
+document.getElementById('btnOpenAdd').addEventListener('click', () => openModal());
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+document.getElementById('btnSave').addEventListener('click', saveProject);
+
+document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
+document.getElementById('btnConfirmDel').addEventListener('click', deleteProject);
+
+// 오버레이 클릭 시 닫기
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.getElementById('confirmOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeConfirm();
+});
+
+// ESC 키
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); closeCfModal(); }
+});
+
+// Enter 키 (폼)
+document.getElementById('inputUrl').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveProject();
+});
+
+// 카드 버튼 이벤트 위임
+document.getElementById('cardGrid').addEventListener('click', e => {
+  const id = e.target.dataset.id;
+  if (!id) return;
+  if (e.target.classList.contains('btn-edit')) {
+    const p = load().find(x => x.id === id);
+    if (p) openModal(p);
+  } else if (e.target.classList.contains('btn-del')) {
+    openConfirm(id);
+  }
+});
+
+// ── Cloudflare 연동 ──
+const CF_CREDS_KEY = 'webapp_cf_creds';
+
+function loadCfCreds() {
+  try { return JSON.parse(localStorage.getItem(CF_CREDS_KEY)) || null; }
+  catch { return null; }
+}
+
+function saveCfCreds(creds) {
+  if (creds) localStorage.setItem(CF_CREDS_KEY, JSON.stringify(creds));
+  else localStorage.removeItem(CF_CREDS_KEY);
+}
+
+function updateCfUI() {
+  const creds = loadCfCreds();
+  const btn  = document.getElementById('btnCfSettings');
+  const bar  = document.getElementById('syncBar');
+  const disc = document.getElementById('btnCfDisconnect');
+  if (creds) {
+    btn.classList.add('connected');
+    document.getElementById('cfConnectLabel').textContent = 'Cloudflare ✓';
+    bar.classList.add('visible');
+    if (disc) disc.classList.add('visible');
+  } else {
+    btn.classList.remove('connected');
+    document.getElementById('cfConnectLabel').textContent = 'Cloudflare 연동';
+    bar.classList.remove('visible');
+    if (disc) disc.classList.remove('visible');
+  }
+}
+
+async function syncCloudflare() {
+  const creds = loadCfCreds();
+  if (!creds) return;
+
+  const btn  = document.getElementById('btnSync');
+  const dot  = document.getElementById('syncDot');
+  const info = document.getElementById('syncInfo');
+
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  dot.className = 'sync-dot loading';
+  info.textContent = '동기화 중...';
+
+  try {
+    // Account ID가 없으면 Account: Read 권한으로 자동 조회 시도
+    if (!creds.accountId) {
+      const accRes  = await fetch('https://api.cloudflare.com/client/v4/accounts?per_page=1',
+        { headers: { Authorization: `Bearer ${creds.token}` } });
+      const accData = await accRes.json();
+      if (accData.success && accData.result?.length) {
+        creds.accountId = accData.result[0].id;
+        saveCfCreds(creds);
+        document.getElementById('cfAccountId').value = creds.accountId;
+      } else {
+        throw new Error('Account ID가 없습니다. 설정에서 직접 입력하세요.');
+      }
+    }
+
+    let allProjects = [];
+    let page = 1;
+    while (true) {
+      const res = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(creds.accountId)}/pages/projects?per_page=100&page=${page}`,
+        { headers: { Authorization: `Bearer ${creds.token}` } }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.errors?.[0]?.message || 'API 오류');
+      allProjects = allProjects.concat(data.result);
+      if (allProjects.length >= (data.result_info?.total_count ?? allProjects.length)) break;
+      page++;
+    }
+
+    const projects  = load();
+    const cfIds     = new Set(allProjects.map(p => p.id));
+    // CF에서 삭제된 프로젝트 제거
+    const kept      = projects.filter(p => p.source !== 'cloudflare' || cfIds.has(p.cfProjectId));
+    // 이미 등록된 CF 프로젝트 ID
+    const existing  = new Set(kept.filter(p => p.source === 'cloudflare').map(p => p.cfProjectId));
+
+    for (const cfp of allProjects) {
+      if (existing.has(cfp.id)) continue;
+      const productionUrl = cfp.subdomain ? `https://${cfp.subdomain}` : null;
+      if (!productionUrl) continue;
+      kept.push({
+        id: crypto.randomUUID(),
+        name: cfp.name,
+        desc: '',
+        url: productionUrl,
+        createdAt: Date.now(),
+        source: 'cloudflare',
+        cfProjectId: cfp.id
+      });
+    }
+
+    save(kept);
+    const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    dot.className  = 'sync-dot';
+    info.textContent = `마지막 동기화: ${time} · ${allProjects.length}개 프로젝트`;
+    render();
+  } catch (err) {
+    dot.className = 'sync-dot error';
+    const isCors = err.message === 'Failed to fetch' || err.name === 'TypeError';
+    info.textContent = isCors
+      ? '동기화 실패: CORS 차단 — http://localhost:8080 으로 열어주세요.'
+      : `동기화 실패: ${err.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+  }
+}
+
+// CF 설정 모달
+function openCfModal() {
+  const creds = loadCfCreds();
+  document.getElementById('cfAccountId').value = creds?.accountId ?? '';
+  document.getElementById('cfApiToken').value  = creds?.token     ?? '';
+  const disc = document.getElementById('btnCfDisconnect');
+  if (disc) disc.classList.toggle('visible', !!creds);
+  document.getElementById('cfModalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('cfAccountId').focus(), 50);
+}
+
+function closeCfModal() {
+  document.getElementById('cfModalOverlay').classList.remove('open');
+}
+
+document.getElementById('btnCfSettings').addEventListener('click', openCfModal);
+document.getElementById('btnCfCancel').addEventListener('click', closeCfModal);
+document.getElementById('cfModalOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCfModal();
+});
+
+document.getElementById('btnCfSave').addEventListener('click', async () => {
+  const accountId = document.getElementById('cfAccountId').value.trim();
+  const token     = document.getElementById('cfApiToken').value.trim();
+  if (!accountId || !token) return;
+  saveCfCreds({ accountId, token });
+  closeCfModal();
+  updateCfUI();
+  await syncCloudflare();
+});
+
+document.getElementById('btnCfDisconnect').addEventListener('click', () => {
+  const projects = load().filter(p => p.source !== 'cloudflare');
+  save(projects);
+  saveCfCreds(null);
+  closeCfModal();
+  updateCfUI();
+  render();
+});
+
+document.getElementById('btnSync').addEventListener('click', syncCloudflare);
+
+// 5분마다 자동 동기화
+setInterval(() => { if (loadCfCreds()) syncCloudflare(); }, 5 * 60 * 1000);
+
+// ── Drag & Drop ──
+let dragCounter = 0;
+
+function extractUrl(dt) {
+  // 1순위: text/uri-list (탭·링크 드래그 시 표준 포맷)
+  const uriList = dt.getData('text/uri-list');
+  if (uriList) {
+    const first = uriList.split('\n').map(s => s.trim()).find(s => s && !s.startsWith('#'));
+    if (first) return first;
+  }
+  // 2순위: text/plain (주소창 텍스트 드래그 등)
+  const plain = dt.getData('text/plain').trim();
+  try { const u = new URL(plain); if (u.protocol === 'http:' || u.protocol === 'https:') return plain; } catch {}
+  return null;
+}
+
+document.addEventListener('dragenter', e => {
+  if (!e.dataTransfer.types.some(t => t === 'text/uri-list' || t === 'text/plain')) return;
+  dragCounter++;
+  document.getElementById('dropOverlay').classList.add('active');
+  e.preventDefault();
+});
+
+document.addEventListener('dragleave', e => {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    document.getElementById('dropOverlay').classList.remove('active');
+  }
+});
+
+document.addEventListener('dragover', e => e.preventDefault());
+
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  dragCounter = 0;
+  document.getElementById('dropOverlay').classList.remove('active');
+
+  const url = extractUrl(e.dataTransfer);
+  if (!url) return;
+
+  // hostname을 기본 이름으로 제안
+  let suggestedName = '';
+  try { suggestedName = new URL(url).hostname.replace(/^www\./, ''); } catch {}
+
+  openModal(null);
+  document.getElementById('inputUrl').value  = url;
+  document.getElementById('inputName').value = suggestedName;
+  document.getElementById('inputName').select();
+  document.getElementById('inputName').focus();
+});
+
+// ── Init ──
+updateCfUI();
+render();
+if (loadCfCreds()) syncCloudflare();
+</script>
+</body>
+</html>
