@@ -7,7 +7,7 @@
   <title>Bluepapa's Vibecoding</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,7 +48,7 @@
     }
 
     .logo {
-      font-family: 'Pacifico', cursive;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 1.25rem;
       font-weight: 400;
       letter-spacing: .3px;
@@ -435,6 +435,7 @@
     }
     .form-hint a { color: #f6821f; text-decoration: none; }
     .form-hint a:hover { text-decoration: underline; }
+    #metaLoading { display: none; font-size: .75rem; color: var(--accent-h); }
 
     .form-hint code { font-size:.78rem; background:var(--bg); padding:.1rem .4rem; border-radius:4px; }
 
@@ -533,7 +534,7 @@
     </div>
 
     <div class="form-group">
-      <label for="inputDesc">설명</label>
+      <label for="inputDesc">설명 <span id="metaLoading">⚡ 자동 불러오는 중...</span></label>
       <textarea id="inputDesc" placeholder="어떤 앱인지 간단히 설명해주세요." maxlength="200"></textarea>
     </div>
 
@@ -803,6 +804,28 @@ document.getElementById('inputUrl').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveProject();
 });
 
+// URL 입력 후 메타 자동 추옵
+document.getElementById('inputUrl').addEventListener('blur', async e => {
+  const url = e.target.value.trim();
+  if (!url) return;
+  try { new URL(url); } catch { return; }
+
+  const nameEl = document.getElementById('inputName');
+  const descEl = document.getElementById('inputDesc');
+  const loadEl = document.getElementById('metaLoading');
+  // 이미 이름과 설명이 모두 있으면 건너뛰
+  if (nameEl.value.trim() && descEl.value.trim()) return;
+
+  loadEl.style.display = 'inline';
+  try {
+    const res  = await fetch(`/api/fetch-meta?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.title && !nameEl.value.trim()) nameEl.value = data.title;
+    if (data.desc  && !descEl.value.trim()) descEl.value = data.desc;
+  } catch {}
+  finally { loadEl.style.display = 'none'; }
+});
+
 // 카드 버튼 이벤트 위임
 document.getElementById('cardGrid').addEventListener('click', e => {
   const id = e.target.dataset.id;
@@ -1014,10 +1037,33 @@ document.addEventListener('drop', e => {
   document.getElementById('inputName').focus();
 });
 
+// ── 빈 설명 자동 채우기 (비동기) ──
+async function fetchMissingDescriptions() {
+  const projects = load().filter(p => !p.desc);
+  if (!projects.length) return;
+
+  for (const p of projects) {
+    try {
+      const res  = await fetch(`/api/fetch-meta?url=${encodeURIComponent(p.url)}`);
+      const data = await res.json();
+      if (!data.desc) continue;
+      // 저장소 재읽기 (동시 수정 경합 방지)
+      const all = load();
+      const idx = all.findIndex(x => x.id === p.id);
+      if (idx !== -1 && !all[idx].desc) {
+        all[idx].desc = data.desc;
+        save(all);
+        render();
+      }
+    } catch {}
+  }
+}
+
 // ── Init ──
 updateCfUI();
 render();
-if (loadCfCreds()) syncCloudflare();
+if (loadCfCreds()) syncCloudflare().then(fetchMissingDescriptions);
+else fetchMissingDescriptions();
 </script>
 </body>
 </html>
