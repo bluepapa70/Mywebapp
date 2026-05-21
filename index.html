@@ -860,34 +860,23 @@ async function syncCloudflare() {
   info.textContent = '동기화 중...';
 
   try {
-    // Account ID가 없으면 Account: Read 권한으로 자동 조회 시도
-    if (!creds.accountId) {
-      const accRes  = await fetch('https://api.cloudflare.com/client/v4/accounts?per_page=1',
-        { headers: { Authorization: `Bearer ${creds.token}` } });
-      const accData = await accRes.json();
-      if (accData.success && accData.result?.length) {
-        creds.accountId = accData.result[0].id;
-        saveCfCreds(creds);
-        document.getElementById('cfAccountId').value = creds.accountId;
-      } else {
-        throw new Error('Account ID가 없습니다. 설정에서 직접 입력하세요.');
-      }
+    // /api/cf-sync Pages Function 프록시를 통해 호출 (CORS 우회)
+    const proxyRes = await fetch('/api/cf-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: creds.token, accountId: creds.accountId || null }),
+    });
+    const proxyData = await proxyRes.json();
+    if (!proxyData.success) throw new Error(proxyData.error || 'API 오류');
+
+    // 서버에서 accountId를 자동 감지한 경우 저장
+    if (proxyData.accountId && !creds.accountId) {
+      creds.accountId = proxyData.accountId;
+      saveCfCreds(creds);
+      document.getElementById('cfAccountId').value = creds.accountId;
     }
 
-    let allProjects = [];
-    let page = 1;
-    while (true) {
-      const res = await fetch(
-        `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(creds.accountId)}/pages/projects?per_page=100&page=${page}`,
-        { headers: { Authorization: `Bearer ${creds.token}` } }
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (!data.success) throw new Error(data.errors?.[0]?.message || 'API 오류');
-      allProjects = allProjects.concat(data.result);
-      if (allProjects.length >= (data.result_info?.total_count ?? allProjects.length)) break;
-      page++;
-    }
+    const allProjects = proxyData.projects;
 
     const projects  = load();
     const cfIds     = new Set(allProjects.map(p => p.id));
