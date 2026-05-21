@@ -1,0 +1,13 @@
+name = "mywebapp"
+pages_build_output_dir = "."
+
+# ── Cloudflare KV 바인딩 (로컬 개발용) ──
+# 1. Cloudflare 대시보드 > Workers & Pages > KV > 네임스페이스 만들기
+#    이름 예시: mywebapp-projects
+# 2. 아래 id / preview_id에 발급받은 네임스페이스 ID 입력
+# 3. 프로덕션: Pages 프로젝트 > Settings > Functions > KV namespace bindings
+#    Variable name: PROJECTS_KV  →  선택한 네임스페이스
+[[kv_namespaces]]
+binding     = "PROJECTS_KV"
+id          = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+preview_id  = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
