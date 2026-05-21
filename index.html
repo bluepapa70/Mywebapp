@@ -816,12 +816,8 @@ function render() {
     const cfBadge = p.source === 'cloudflare'
       ? '<span class="cf-badge">&#9729; CF Pages</span>'
       : '';
-    const thumbUrl = p.thumb || ('https://image.thum.io/get/viewportWidth/390/width/390/crop/219/' + p.url);
     card.innerHTML = `
-      <div class="card-thumb">
-        <div class="thumb-skeleton"></div>
-        <img src="${escHtml(thumbUrl)}" loading="lazy" alt="">
-      </div>
+      ${p.thumb ? `<div class="card-thumb"><div class="thumb-skeleton"></div><img src="${escHtml(p.thumb)}" loading="lazy" alt=""></div>` : ''}
       <div class="card-header">
         <div class="card-icon">${getIcon(p.name)}</div>
         <div>
@@ -836,12 +832,13 @@ function render() {
         <button class="btn-del"  data-id="${p.id}">삭제</button>
       </div>`;
 
-    const img = card.querySelector('.card-thumb img');
-    const skel = card.querySelector('.thumb-skeleton');
-    img.addEventListener('load', () => { img.classList.add('loaded'); skel.remove(); });
-    img.addEventListener('error', () => { card.querySelector('.card-thumb').remove(); });
-    // 이미 캐시된 경우 load 이벤트가 발생하지 않으므로 직접 처리
-    if (img.complete && img.naturalWidth > 0) { img.classList.add('loaded'); skel.remove(); }
+    if (p.thumb) {
+      const img = card.querySelector('.card-thumb img');
+      const skel = card.querySelector('.thumb-skeleton');
+      img.addEventListener('load', () => { img.classList.add('loaded'); skel.remove(); });
+      img.addEventListener('error', () => { card.querySelector('.card-thumb').remove(); });
+      if (img.complete && img.naturalWidth > 0) { img.classList.add('loaded'); skel.remove(); }
+    }
 
     grid.appendChild(card);
   });
