@@ -432,6 +432,23 @@
     }
 
     .header-right { display: flex; align-items: center; gap: .5rem; }
+
+    .btn-share {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: .5rem .9rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-share svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .btn-share:hover { border-color: var(--accent); color: var(--accent-h); }
     #metaLoading { display: none; font-size: .75rem; color: var(--accent-h); }
 
     /* ── Drop Overlay ── */
@@ -482,6 +499,14 @@
     Bluepapa's Vibecoding
   </div>
   <div class="header-right">
+    <button class="btn-share" id="btnShare" title="프로젝트 목록 공유">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      공유
+    </button>
     <button class="btn-add" id="btnOpenAdd">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M12 5v14M5 12h14"/>
@@ -1003,7 +1028,46 @@ async function fetchMissingDescriptions() {
   }
 }
 
+// ── 공유 (URL 해시 기반 기기 간 동기화) ──
+function exportShare() {
+  const projects = load();
+  if (!projects.length) { alert('공유할 프로젝트가 없습니다.'); return; }
+  // 썸네일 제외 (해시 URL 길이 절약)
+  const data = projects.map(({ thumb, ...p }) => p);
+  const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+  const url = `${location.origin}${location.pathname}#share=${encoded}`;
+  if (navigator.share) {
+    navigator.share({ title: "Bluepapa's Vibecoding", url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(url)
+      .then(() => alert('공유 링크가 클립보드에 복사되었습니다.\n모바일 브라우저에서 이 링크를 열면 프로젝트 목록을 가져올 수 있습니다.'))
+      .catch(() => prompt('아래 링크를 복사해 모바일에서 열어주세요.', url));
+  }
+}
+
+function importFromHash() {
+  const hash = location.hash;
+  if (!hash.startsWith('#share=')) return;
+  history.replaceState(null, '', location.pathname);
+  try {
+    const encoded = hash.slice('#share='.length);
+    const incoming = JSON.parse(decodeURIComponent(atob(encoded)));
+    if (!Array.isArray(incoming) || !incoming.length) return;
+    const existing = load();
+    const existingUrls = new Set(existing.map(p => p.url));
+    const toAdd = incoming.filter(p => p.url && !existingUrls.has(p.url));
+    if (!toAdd.length) { alert('모든 프로젝트가 이미 존재합니다.'); return; }
+    if (confirm(`${toAdd.length}개의 프로젝트를 가져올까요?`)) {
+      save([...existing, ...toAdd]);
+      render();
+    }
+  } catch {}
+}
+
+document.getElementById('btnShare').addEventListener('click', exportShare);
+
 // ── Init ──
+importFromHash();
 render();
 fetchMissingDescriptions();
 </script>
