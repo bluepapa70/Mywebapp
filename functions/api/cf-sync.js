@@ -29,19 +29,13 @@ export async function onRequestPost(context) {
       resolvedAccountId = accData.result[0].id;
     }
 
-    // Pages 프로젝트 전체 페이지 조회 (per_page 최대 25)
-    let allProjects = [];
-    let page = 1;
-    while (true) {
-      const res  = await cfFetch(token, `/accounts/${encodeURIComponent(resolvedAccountId)}/pages/projects?per_page=25&page=${page}`);
-      const data = await res.json();
-      if (!data.success) {
-        return json({ success: false, error: data.errors?.[0]?.message || 'Cloudflare API 오류' }, 502);
-      }
-      allProjects = allProjects.concat(data.result);
-      if (allProjects.length >= (data.result_info?.total_count ?? allProjects.length)) break;
-      page++;
+    // Pages 프로젝트 목록 조회 (Pages API는 페이지네이션 미지원 — 파라미터 없이 호출)
+    const pagesRes  = await cfFetch(token, `/accounts/${encodeURIComponent(resolvedAccountId)}/pages/projects`);
+    const pagesData = await pagesRes.json();
+    if (!pagesData.success) {
+      return json({ success: false, error: pagesData.errors?.[0]?.message || 'Cloudflare API 오류' }, 502);
     }
+    const allProjects = pagesData.result ?? [];
 
     return json({ success: true, accountId: resolvedAccountId, projects: allProjects });
   } catch (err) {
