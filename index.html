@@ -431,155 +431,8 @@
       cursor: pointer;
     }
 
-    /* ── Cloudflare 연동 ── */
     .header-right { display: flex; align-items: center; gap: .5rem; }
-
-    .btn-cf {
-      display: flex;
-      align-items: center;
-      gap: .35rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: .5rem .9rem;
-      border-radius: 8px;
-      font-size: .85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .2s;
-      white-space: nowrap;
-    }
-    .btn-cf svg { width: 15px; height: 15px; flex-shrink: 0; }
-    .btn-cf:hover { border-color: #f6821f; color: #f6821f; }
-    .btn-cf.connected { border-color: rgba(246,130,31,.5); color: #f6821f; }
-
-    .btn-sync {
-      display: flex;
-      align-items: center;
-      gap: .3rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: .25rem .75rem;
-      border-radius: 6px;
-      font-size: .78rem;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .btn-sync:hover:not(:disabled) { color: var(--text); border-color: #f6821f; }
-    .btn-sync:disabled { opacity: .45; cursor: not-allowed; }
-    .btn-sync.spinning svg { animation: spin .7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .btn-select {
-      display: flex;
-      align-items: center;
-      gap: .3rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: .25rem .75rem;
-      border-radius: 6px;
-      font-size: .78rem;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .btn-select:hover { color: var(--text); border-color: var(--accent); }
-
-    /* ── 프로젝트 선택 모달 ── */
-    .project-select-list {
-      display: flex;
-      flex-direction: column;
-      gap: .4rem;
-      max-height: 340px;
-      overflow-y: auto;
-      margin: .5rem 0 1rem;
-      padding-right: .25rem;
-    }
-    .project-select-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .65rem .85rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: border-color .15s;
-    }
-    .project-select-item:hover { border-color: var(--accent); }
-    .project-select-item input[type="checkbox"] {
-      width: 16px; height: 16px; flex-shrink: 0;
-      accent-color: var(--accent); cursor: pointer;
-    }
-    .project-select-item input[type="checkbox"]:focus { outline: 2px solid var(--accent); }
-    .project-select-name { font-size: .9rem; font-weight: 600; flex: 1; }
-    .project-select-url  { font-size: .73rem; color: var(--text-muted); }
-    .select-loading { text-align:center; padding: 2rem; color: var(--text-muted); font-size:.85rem; }
-
-    .sync-bar {
-      display: none;
-      align-items: center;
-      gap: .65rem;
-      margin-bottom: 1.1rem;
-      padding: .55rem .85rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-    .sync-bar.visible { display: flex; }
-    .sync-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0;
-    }
-    .sync-dot.error { background: var(--danger); }
-    .sync-dot.loading { background: #f6821f; animation: pulse .9s ease infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-    .sync-info { font-size: .78rem; color: var(--text-muted); flex: 1; }
-
-    .cf-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .2rem;
-      font-size: .68rem;
-      font-weight: 600;
-      color: #f6821f;
-      background: rgba(246,130,31,.1);
-      border: 1px solid rgba(246,130,31,.25);
-      border-radius: 4px;
-      padding: .1rem .38rem;
-      line-height: 1.4;
-    }
-
-    .btn-danger {
-      background: transparent;
-      border: 1px solid var(--danger);
-      color: var(--danger);
-      padding: .5rem 1rem;
-      border-radius: 8px;
-      font-size: .9rem;
-      cursor: pointer;
-      transition: background .2s;
-      margin-right: auto;
-    }
-    .btn-danger:hover { background: rgba(239,68,68,.1); }
-    #btnCfDisconnect { display: none; }
-    #btnCfDisconnect.visible { display: block; }
-
-    .form-hint {
-      font-size: .8rem;
-      color: var(--text-muted);
-      margin-bottom: 1.2rem;
-      line-height: 1.55;
-      padding: .7rem .9rem;
-      background: var(--surface2);
-      border-radius: 8px;
-      border-left: 3px solid #f6821f;
-    }
-    .form-hint a { color: #f6821f; text-decoration: none; }
-    .form-hint a:hover { text-decoration: underline; }
     #metaLoading { display: none; font-size: .75rem; color: var(--accent-h); }
-
-    .form-hint code { font-size:.78rem; background:var(--bg); padding:.1rem .4rem; border-radius:4px; }
 
     /* ── Drop Overlay ── */
     .drop-overlay {
@@ -629,14 +482,6 @@
     Bluepapa's Vibecoding
   </div>
   <div class="header-right">
-    <button class="btn-cf" id="btnCfSettings">
-      <!-- Cloudflare 로고 색상 아이콘 -->
-      <svg viewBox="0 0 32 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M21.44 14.56c.18-.62.11-1.19-.2-1.61-.28-.39-.74-.61-1.27-.64l-10.54-.14a.18.18 0 0 1-.16-.1.19.19 0 0 1 .02-.19c.07-.1.18-.16.3-.17l10.65-.14c1.26-.06 2.63-1.08 3.11-2.32l.61-1.59a.32.32 0 0 0 .02-.2A8.01 8.01 0 0 0 8.6 9.03a3.67 3.67 0 0 0-3.44-.34 3.7 3.7 0 0 0-2.22 2.6 4.44 4.44 0 0 0 .25 8.84l17.67.14c1.14-.01 2.12-.77 2.45-1.87l.13-.84z" fill="#f6821f"/>
-        <path d="M24.76 8.27c-.13 0-.26 0-.39.01a5.35 5.35 0 0 0-9.34-1.65 3.2 3.2 0 0 0-1.58-.42 3.23 3.23 0 0 0-3.06 2.2 4.44 4.44 0 0 0 .69 8.83h13.68a4.49 4.49 0 0 0 0-8.97z" fill="#fbad41"/>
-      </svg>
-      <span id="cfConnectLabel">Cloudflare 연동</span>
-    </button>
     <button class="btn-add" id="btnOpenAdd">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M12 5v14M5 12h14"/>
@@ -648,24 +493,6 @@
 
 <!-- ── Main ── -->
 <main>
-  <!-- Cloudflare 동기화 상태 바 -->
-  <div class="sync-bar" id="syncBar">
-    <span class="sync-dot" id="syncDot"></span>
-    <span class="sync-info" id="syncInfo">Cloudflare Pages 연동됨</span>
-    <button class="btn-sync" id="btnSync">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
-        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5"/>
-        <path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
-      </svg>
-      동기화
-    </button>
-    <button class="btn-select" id="btnCfSelect">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
-        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-      </svg>
-      프로젝트 선택
-    </button>
-  </div>
   <p class="section-title" id="cardCount">프로젝트 0개</p>
   <div class="card-grid" id="cardGrid"></div>
 </main>
@@ -709,46 +536,6 @@
     <div class="modal-actions">
       <button class="btn-cancel" id="btnCancel">취소</button>
       <button class="btn-save"   id="btnSave">저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── Cloudflare 설정 모달 ── -->
-<div class="modal-overlay" id="cfModalOverlay">
-  <div class="modal" role="dialog" aria-modal="true">
-    <p class="modal-title">Cloudflare Pages 연동</p>
-    <p class="form-hint">
-      <strong>Account ID</strong>: Cloudflare 대시보드 접속 후 URL에서 확인하세요.<br>
-      <code>https://dash.cloudflare.com/<strong>[Account ID]</strong>/workers-and-pages</code><br><br>
-      <strong>API Token</strong>: <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener">My Profile → API Tokens</a>에서
-      <strong>Custom token</strong>으로 생성 — 권한: <strong>Cloudflare Pages: Read</strong>
-      + <strong>Account: Read</strong> (Account ID 자동 감지용)
-    </p>
-    <div class="form-group">
-      <label for="cfAccountId">Account ID</label>
-      <input type="text" id="cfAccountId" placeholder="32자리 Account ID" autocomplete="off" />
-    </div>
-    <div class="form-group">
-      <label for="cfApiToken">API Token</label>
-      <input type="password" id="cfApiToken" placeholder="Bearer Token" autocomplete="off" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn-danger" id="btnCfDisconnect">연동 해제</button>
-      <button class="btn-cancel" id="btnCfCancel">취소</button>
-      <button class="btn-save" id="btnCfSave">저장 및 동기화</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── CF 프로젝트 선택 모달 ── -->
-<div class="modal-overlay" id="cfSelectOverlay">
-  <div class="modal" role="dialog" aria-modal="true">
-    <p class="modal-title">동기화할 프로젝트 선택</p>
-    <p class="form-hint">체크된 프로젝트만 대시보드에 표시됩니다. 체크 해제하면 카드가 제거됩니다.</p>
-    <div class="project-select-list" id="cfSelectList"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="btnCfSelectCancel">취소</button>
-      <button class="btn-save"   id="btnCfSelectApply">적용</button>
     </div>
   </div>
 </div>
@@ -813,15 +600,12 @@ function render() {
   projects.forEach(p => {
     const card = document.createElement('div');
     card.className = 'card';
-    const cfBadge = p.source === 'cloudflare'
-      ? '<span class="cf-badge">&#9729; CF Pages</span>'
-      : '';
     card.innerHTML = `
       ${p.thumb ? `<div class="card-thumb"><div class="thumb-skeleton"></div><img src="${escHtml(p.thumb)}" loading="lazy" alt=""></div>` : ''}
       <div class="card-header">
         <div class="card-icon">${getIcon(p.name)}</div>
         <div>
-          <div class="card-title">${escHtml(p.name)}${cfBadge ? ' ' + cfBadge : ''}</div>
+          <div class="card-title">${escHtml(p.name)}</div>
           <div class="card-url">${escHtml(trimUrl(p.url))}</div>
         </div>
       </div>
@@ -1099,7 +883,7 @@ document.getElementById('confirmOverlay').addEventListener('click', e => {
 
 // ESC 키
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeConfirm(); closeCfModal(); closeCfSelectModal(); }
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); }
 });
 
 // Enter 키 (폼)
@@ -1141,222 +925,9 @@ document.getElementById('cardGrid').addEventListener('click', e => {
   }
 });
 
-// ── Cloudflare 연동 ──
-const CF_CREDS_KEY = 'webapp_cf_creds';
 
-function loadCfCreds() {
-  try { return JSON.parse(localStorage.getItem(CF_CREDS_KEY)) || null; }
-  catch { return null; }
-}
 
-function saveCfCreds(creds) {
-  if (creds) localStorage.setItem(CF_CREDS_KEY, JSON.stringify(creds));
-  else localStorage.removeItem(CF_CREDS_KEY);
-}
 
-function updateCfUI() {
-  const creds = loadCfCreds();
-  const btn  = document.getElementById('btnCfSettings');
-  const bar  = document.getElementById('syncBar');
-  const disc = document.getElementById('btnCfDisconnect');
-  if (creds) {
-    btn.classList.add('connected');
-    document.getElementById('cfConnectLabel').textContent = 'Cloudflare ✓';
-    bar.classList.add('visible');
-    if (disc) disc.classList.add('visible');
-  } else {
-    btn.classList.remove('connected');
-    document.getElementById('cfConnectLabel').textContent = 'Cloudflare 연동';
-    bar.classList.remove('visible');
-    if (disc) disc.classList.remove('visible');
-  }
-}
-
-async function syncCloudflare() {
-  const creds = loadCfCreds();
-  if (!creds) return;
-
-  const btn  = document.getElementById('btnSync');
-  const dot  = document.getElementById('syncDot');
-  const info = document.getElementById('syncInfo');
-
-  btn.disabled = true;
-  btn.classList.add('spinning');
-  dot.className = 'sync-dot loading';
-  info.textContent = '동기화 중...';
-
-  try {
-    // /api/cf-sync Pages Function 프록시를 통해 호출 (CORS 우회)
-    const proxyRes = await fetch('/api/cf-sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: creds.token, accountId: creds.accountId || null }),
-    });
-    const proxyData = await proxyRes.json();
-    if (!proxyData.success) throw new Error(proxyData.error || 'API 오류');
-
-    // 서버에서 accountId를 자동 감지한 경우 저장
-    if (proxyData.accountId && !creds.accountId) {
-      creds.accountId = proxyData.accountId;
-      saveCfCreds(creds);
-      document.getElementById('cfAccountId').value = creds.accountId;
-    }
-
-    const allProjects = proxyData.projects;
-
-    const excluded  = loadCfExcluded();
-    const projects  = load();
-    const cfIds     = new Set(allProjects.map(p => p.id));
-    // CF에서 삭제된 프로젝트 제거
-    const kept      = projects.filter(p => p.source !== 'cloudflare' || cfIds.has(p.cfProjectId));
-    // 이미 등록된 CF 프로젝트 ID
-    const existing  = new Set(kept.filter(p => p.source === 'cloudflare').map(p => p.cfProjectId));
-
-    for (const cfp of allProjects) {
-      if (existing.has(cfp.id)) continue;
-      if (excluded.has(cfp.id)) continue;   // 제외 목록에 있으면 건너뜀
-      const productionUrl = cfp.subdomain ? `https://${cfp.subdomain}` : null;
-      if (!productionUrl) continue;
-      kept.push({
-        id: crypto.randomUUID(),
-        name: cfp.name,
-        desc: '',
-        url: productionUrl,
-        createdAt: Date.now(),
-        source: 'cloudflare',
-        cfProjectId: cfp.id
-      });
-    }
-
-    save(kept);
-    const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-    dot.className  = 'sync-dot';
-    info.textContent = `마지막 동기화: ${time} · ${allProjects.length}개 프로젝트`;
-    render();
-  } catch (err) {
-    dot.className = 'sync-dot error';
-    const isCors = err.message === 'Failed to fetch' || err.name === 'TypeError';
-    info.textContent = isCors
-      ? '동기화 실패: CORS 차단 — http://localhost:8080 으로 열어주세요.'
-      : `동기화 실패: ${err.message}`;
-  } finally {
-    btn.disabled = false;
-    btn.classList.remove('spinning');
-  }
-}
-
-// CF 설정 모달
-function openCfModal() {
-  const creds = loadCfCreds();
-  document.getElementById('cfAccountId').value = creds?.accountId ?? '';
-  document.getElementById('cfApiToken').value  = creds?.token     ?? '';
-  const disc = document.getElementById('btnCfDisconnect');
-  if (disc) disc.classList.toggle('visible', !!creds);
-  document.getElementById('cfModalOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('cfAccountId').focus(), 50);
-}
-
-function closeCfModal() {
-  document.getElementById('cfModalOverlay').classList.remove('open');
-}
-
-document.getElementById('btnCfSettings').addEventListener('click', openCfModal);
-document.getElementById('btnCfCancel').addEventListener('click', closeCfModal);
-document.getElementById('cfModalOverlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeCfModal();
-});
-
-document.getElementById('btnCfSave').addEventListener('click', async () => {
-  const accountId = document.getElementById('cfAccountId').value.trim();
-  const token     = document.getElementById('cfApiToken').value.trim();
-  if (!accountId || !token) return;
-  saveCfCreds({ accountId, token });
-  closeCfModal();
-  updateCfUI();
-  await syncCloudflare();
-});
-
-document.getElementById('btnCfDisconnect').addEventListener('click', () => {
-  const projects = load().filter(p => p.source !== 'cloudflare');
-  save(projects);
-  saveCfCreds(null);
-  closeCfModal();
-  updateCfUI();
-  render();
-});
-
-document.getElementById('btnSync').addEventListener('click', syncCloudflare);
-
-// ── CF 프로젝트 선택 모달 ──
-const CF_EXCLUDED_KEY = 'webapp_cf_excluded';
-
-function loadCfExcluded() {
-  try { return new Set(JSON.parse(localStorage.getItem(CF_EXCLUDED_KEY)) || []); }
-  catch { return new Set(); }
-}
-
-function saveCfExcluded(set) {
-  localStorage.setItem(CF_EXCLUDED_KEY, JSON.stringify([...set]));
-}
-
-async function openCfSelectModal() {
-  const list = document.getElementById('cfSelectList');
-  list.innerHTML = '<p class="select-loading">프로젝트 목록을 불러오는 중...</p>';
-  document.getElementById('cfSelectOverlay').classList.add('open');
-
-  try {
-    const creds = loadCfCreds();
-    if (!creds) { closeCfSelectModal(); return; }
-
-    const res  = await fetch('/api/cf-sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: creds.token, accountId: creds.accountId || null }),
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error);
-
-    const excluded = loadCfExcluded();
-    list.innerHTML = data.projects.map(p => `
-      <label class="project-select-item">
-        <input type="checkbox" value="${escHtml(p.id)}" ${excluded.has(p.id) ? '' : 'checked'} />
-        <span class="project-select-name">${escHtml(p.name)}</span>
-        <span class="project-select-url">${escHtml(p.subdomain || '')}.pages.dev</span>
-      </label>`).join('');
-  } catch (err) {
-    list.innerHTML = `<p class="select-loading">오류: ${escHtml(err.message)}</p>`;
-  }
-}
-
-function closeCfSelectModal() {
-  document.getElementById('cfSelectOverlay').classList.remove('open');
-}
-
-function applyCfSelection() {
-  const checkboxes = document.querySelectorAll('#cfSelectList input[type="checkbox"]');
-  const excluded = new Set();
-  checkboxes.forEach(cb => { if (!cb.checked) excluded.add(cb.value); });
-  saveCfExcluded(excluded);
-
-  // 제외된 CF 카드 즉시 제거
-  const projects = load().filter(p => p.source !== 'cloudflare' || !excluded.has(p.cfProjectId));
-  save(projects);
-
-  closeCfSelectModal();
-  render();
-  // 새로 체크된 항목 추가를 위해 재동기화
-  syncCloudflare().then(fetchMissingDescriptions);
-}
-
-document.getElementById('btnCfSelect').addEventListener('click', openCfSelectModal);
-document.getElementById('btnCfSelectCancel').addEventListener('click', closeCfSelectModal);
-document.getElementById('btnCfSelectApply').addEventListener('click', applyCfSelection);
-document.getElementById('cfSelectOverlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeCfSelectModal();
-});
-
-// 5분마다 자동 동기화
-setInterval(() => { if (loadCfCreds()) syncCloudflare(); }, 5 * 60 * 1000);
 
 // ── Drag & Drop ──
 let dragCounter = 0;
@@ -1433,10 +1004,8 @@ async function fetchMissingDescriptions() {
 }
 
 // ── Init ──
-updateCfUI();
 render();
-if (loadCfCreds()) syncCloudflare().then(fetchMissingDescriptions);
-else fetchMissingDescriptions();
+fetchMissingDescriptions();
 </script>
 </body>
 </html>
