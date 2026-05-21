@@ -324,6 +324,60 @@
     }
     .btn-save:hover { background: var(--accent-h); }
 
+    /* ── Modal 스크린샷 섹션 ── */
+    .modal {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .screenshot-preview {
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface2);
+      border: 1px dashed var(--border);
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: .82rem;
+      margin-bottom: .5rem;
+      position: relative;
+    }
+    .screenshot-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+    .ss-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      font-size: .85rem;
+      color: var(--text-muted);
+    }
+    .btn-screenshot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .5rem .9rem;
+      border-radius: 7px;
+      font-size: .84rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      font-family: inherit;
+    }
+    .btn-screenshot:hover { border-color: var(--accent); color: var(--accent-h); }
+
     /* ── Confirm Dialog ── */
     .confirm-overlay {
       display: none;
@@ -628,6 +682,20 @@
       <span class="form-error" id="errUrl"></span>
     </div>
 
+    <div class="form-group">
+      <label>카드 스크린샷</label>
+      <div class="screenshot-preview" id="ssPreview">
+        <span>스크린샷 없음</span>
+      </div>
+      <button type="button" class="btn-screenshot" id="btnTakeScreenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        스크린샷 찍기
+      </button>
+    </div>
+
     <div class="modal-actions">
       <button class="btn-cancel" id="btnCancel">취소</button>
       <button class="btn-save"   id="btnSave">저장</button>
@@ -738,7 +806,7 @@ function render() {
     const cfBadge = p.source === 'cloudflare'
       ? '<span class="cf-badge">&#9729; CF Pages</span>'
       : '';
-    const thumbUrl = 'https://image.thum.io/get/viewportWidth/390/width/390/crop/219/' + p.url;
+    const thumbUrl = p.thumb || ('https://image.thum.io/get/viewportWidth/390/width/390/crop/219/' + p.url);
     card.innerHTML = `
       <div class="card-thumb">
         <div class="thumb-skeleton"></div>
@@ -794,13 +862,16 @@ function trimUrl(url) {
 
 // ── Modal 상태 ──
 let editingId = null;
+let pendingThumb = null;
 
 function openModal(project = null) {
   editingId = project ? project.id : null;
+  pendingThumb = project ? (project.thumb || null) : null;
   document.getElementById('modalTitle').textContent = project ? '프로젝트 수정' : '프로젝트 추가';
   document.getElementById('inputName').value = project ? project.name : '';
   document.getElementById('inputDesc').value = project ? project.desc : '';
   document.getElementById('inputUrl').value  = project ? project.url  : '';
+  updateSsPreview(pendingThumb);
   clearErrors();
   document.getElementById('modalOverlay').classList.add('open');
   document.getElementById('inputName').focus();
@@ -809,11 +880,54 @@ function openModal(project = null) {
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
   editingId = null;
+  pendingThumb = null;
 }
 
 function clearErrors() {
   document.getElementById('errName').textContent = '';
   document.getElementById('errUrl').textContent  = '';
+}
+
+// ── 스크린샷 미리보기 업데이트 ──
+function updateSsPreview(thumbUrl) {
+  const preview = document.getElementById('ssPreview');
+  if (!thumbUrl) { preview.innerHTML = '<span>스크린샷 없음</span>'; return; }
+  preview.innerHTML = '';
+  const img = document.createElement('img');
+  img.alt = '';
+  img.style.opacity = '0';
+  img.style.transition = 'opacity .3s';
+  img.onload = () => { img.style.opacity = '1'; };
+  img.onerror = () => { preview.innerHTML = '<span>미리보기 실패</span>'; };
+  img.src = thumbUrl;
+  preview.appendChild(img);
+}
+
+// ── 스크린샷 찍기 ──
+function takeScreenshot() {
+  const url = document.getElementById('inputUrl').value.trim();
+  if (!url) { document.getElementById('errUrl').textContent = 'URL을 먼저 입력하세요.'; return; }
+  try { const u = new URL(url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
+  catch { document.getElementById('errUrl').textContent = '올바른 URL을 입력하세요.'; return; }
+
+  window.open(url, '_blank', 'noopener,noreferrer');
+
+  const thumbUrl = 'https://image.thum.io/get/viewportWidth/390/width/390/crop/219/' + url;
+  const preview = document.getElementById('ssPreview');
+  preview.innerHTML = '<div class="ss-loading">📷 캡처 중...</div>';
+
+  const img = document.createElement('img');
+  img.alt = '';
+  img.style.opacity = '0';
+  img.style.transition = 'opacity .3s';
+  img.onload = () => {
+    pendingThumb = thumbUrl;
+    preview.innerHTML = '';
+    preview.appendChild(img);
+    requestAnimationFrame(() => { img.style.opacity = '1'; });
+  };
+  img.onerror = () => { preview.innerHTML = '<span>스크린샷을 가져오지 못했습니다.</span>'; };
+  img.src = thumbUrl;
 }
 
 // ── Validate ──
@@ -854,9 +968,14 @@ function saveProject() {
 
   if (editingId) {
     const idx = projects.findIndex(p => p.id === editingId);
-    if (idx !== -1) { projects[idx].name = name; projects[idx].desc = desc; projects[idx].url = url; }
+    if (idx !== -1) {
+      projects[idx].name = name;
+      projects[idx].desc = desc;
+      projects[idx].url = url;
+      if (pendingThumb !== null) projects[idx].thumb = pendingThumb;
+    }
   } else {
-    projects.push({ id: crypto.randomUUID(), name, desc, url, createdAt: Date.now() });
+    projects.push({ id: crypto.randomUUID(), name, desc, url, thumb: pendingThumb, createdAt: Date.now() });
   }
 
   save(projects);
@@ -892,6 +1011,7 @@ function deleteProject() {
 document.getElementById('btnOpenAdd').addEventListener('click', () => openModal());
 document.getElementById('btnCancel').addEventListener('click', closeModal);
 document.getElementById('btnSave').addEventListener('click', saveProject);
+document.getElementById('btnTakeScreenshot').addEventListener('click', takeScreenshot);
 
 document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
 document.getElementById('btnConfirmDel').addEventListener('click', deleteProject);
