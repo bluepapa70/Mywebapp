@@ -29,11 +29,11 @@ export async function onRequestPost(context) {
       resolvedAccountId = accData.result[0].id;
     }
 
-    // Pages 프로젝트 전체 페이지 조회
+    // Pages 프로젝트 전체 페이지 조회 (per_page 최대 25)
     let allProjects = [];
     let page = 1;
     while (true) {
-      const res  = await cfFetch(token, `/accounts/${encodeURIComponent(resolvedAccountId)}/pages/projects?per_page=100&page=${page}`);
+      const res  = await cfFetch(token, `/accounts/${encodeURIComponent(resolvedAccountId)}/pages/projects?per_page=25&page=${page}`);
       const data = await res.json();
       if (!data.success) {
         return json({ success: false, error: data.errors?.[0]?.message || 'Cloudflare API 오류' }, 502);
