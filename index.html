@@ -377,6 +377,16 @@
       font-family: inherit;
     }
     .btn-screenshot:hover { border-color: var(--accent); color: var(--accent-h); }
+    .btn-screenshot:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-screenshot.capturing {
+      border-color: var(--accent);
+      color: var(--accent-h);
+      animation: capture-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes capture-pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .55; }
+    }
 
     /* ── Confirm Dialog ── */
     .confirm-overlay {
@@ -904,30 +914,96 @@ function updateSsPreview(thumbUrl) {
 }
 
 // ── 스크린샷 찍기 ──
-function takeScreenshot() {
+async function takeScreenshot() {
   const url = document.getElementById('inputUrl').value.trim();
   if (!url) { document.getElementById('errUrl').textContent = 'URL을 먼저 입력하세요.'; return; }
   try { const u = new URL(url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
   catch { document.getElementById('errUrl').textContent = '올바른 URL을 입력하세요.'; return; }
 
+  const preview = document.getElementById('ssPreview');
+  const btn     = document.getElementById('btnTakeScreenshot');
+
+  // Screen Capture API 미지원 시 thum.io 폴백
+  if (!navigator.mediaDevices?.getDisplayMedia) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    preview.innerHTML = '<div class="ss-loading">📷 캡처 중...</div>';
+    const thumbUrl = 'https://image.thum.io/get/viewportWidth/390/width/390/crop/219/' + url;
+    const img = document.createElement('img');
+    img.alt = ''; img.style.cssText = 'opacity:0;transition:opacity .3s';
+    img.onload = () => { pendingThumb = thumbUrl; preview.innerHTML = ''; preview.appendChild(img); requestAnimationFrame(() => { img.style.opacity = '1'; }); };
+    img.onerror = () => { preview.innerHTML = '<span>스크린샷 실패</span>'; };
+    img.src = thumbUrl;
+    return;
+  }
+
+  // 앱 링크를 새 탭으로 열기
   window.open(url, '_blank', 'noopener,noreferrer');
 
-  const thumbUrl = 'https://image.thum.io/get/viewportWidth/390/width/390/crop/219/' + url;
-  const preview = document.getElementById('ssPreview');
-  preview.innerHTML = '<div class="ss-loading">📷 캡처 중...</div>';
+  preview.innerHTML = '<div class="ss-loading">🖥️ 열린 탭을 선택하세요...</div>';
+  btn.disabled = true;
+  btn.classList.add('capturing');
+  btn.textContent = '캡처 모드 중...';
 
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+  } catch {
+    preview.innerHTML = '<span>캡처가 취소되었습니다.</span>';
+    resetBtn();
+    return;
+  }
+
+  preview.innerHTML = '<div class="ss-loading">✂️ 이미지 처리 중...</div>';
+
+  const video = document.createElement('video');
+  video.srcObject = stream;
+  video.muted = true;
+  video.play();
+
+  // 첫 프레임 대기
+  await new Promise(r => {
+    if (video.readyState >= 2) { r(); return; }
+    video.onloadeddata = r;
+  });
+  await new Promise(r => setTimeout(r, 150));
+
+  // 16:9 상단 중앙 크롭
+  const W = video.videoWidth;
+  const H = video.videoHeight;
+  const ta = 16 / 9;
+  let sx, sy, sw, sh;
+  if (W / H > ta) { sh = H; sw = Math.round(H * ta); sx = Math.round((W - sw) / 2); sy = 0; }
+  else            { sw = W; sh = Math.round(W / ta);  sx = 0; sy = 0; }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 400; canvas.height = 225;
+  canvas.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, 400, 225);
+  stream.getTracks().forEach(t => t.stop());
+
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+  // 클립보드 복사
+  try {
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+  } catch { /* 권한 없을 경우 무시 */ }
+
+  // 미리보기 표시
+  pendingThumb = dataUrl;
+  preview.innerHTML = '';
   const img = document.createElement('img');
-  img.alt = '';
-  img.style.opacity = '0';
-  img.style.transition = 'opacity .3s';
-  img.onload = () => {
-    pendingThumb = thumbUrl;
-    preview.innerHTML = '';
-    preview.appendChild(img);
-    requestAnimationFrame(() => { img.style.opacity = '1'; });
-  };
-  img.onerror = () => { preview.innerHTML = '<span>스크린샷을 가져오지 못했습니다.</span>'; };
-  img.src = thumbUrl;
+  img.alt = ''; img.src = dataUrl;
+  img.style.cssText = 'opacity:0;transition:opacity .3s';
+  preview.appendChild(img);
+  requestAnimationFrame(() => { img.style.opacity = '1'; });
+
+  resetBtn();
+
+  function resetBtn() {
+    btn.disabled = false;
+    btn.classList.remove('capturing');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> 스크린샷 찍기`;
+  }
 }
 
 // ── Validate ──
