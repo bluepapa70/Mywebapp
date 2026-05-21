@@ -737,7 +737,7 @@ function render() {
     const cfBadge = p.source === 'cloudflare'
       ? '<span class="cf-badge">&#9729; CF Pages</span>'
       : '';
-    const thumbUrl = 'https://image.thum.io/get/width/600/crop/338/' + p.url;
+    const thumbUrl = 'https://image.thum.io/get/viewportWidth/390/width/600/crop/338/' + p.url;
     card.innerHTML = `
       <div class="card-thumb">
         <div class="thumb-skeleton"></div>
