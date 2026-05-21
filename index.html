@@ -118,10 +118,41 @@
       flex-direction: column;
       gap: .6rem;
       transition: border-color .2s, transform .15s;
+      overflow: hidden;
     }
     .card:hover {
       border-color: var(--accent);
       transform: translateY(-2px);
+    }
+
+    /* ── Card Thumbnail ── */
+    .card-thumb {
+      margin: -1.25rem -1.25rem .75rem;
+      border-radius: var(--radius) var(--radius) 0 0;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      position: relative;
+      background: var(--surface2);
+    }
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity .4s;
+    }
+    .card-thumb img.loaded { opacity: 1; }
+    .thumb-skeleton {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--surface2) 0%, var(--border) 50%, var(--surface2) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
 
     .card-header {
@@ -706,7 +737,12 @@ function render() {
     const cfBadge = p.source === 'cloudflare'
       ? '<span class="cf-badge">&#9729; CF Pages</span>'
       : '';
+    const thumbUrl = `https://image.thum.io/get/width/600/crop/338/${encodeURIComponent(p.url)}`;
     card.innerHTML = `
+      <div class="card-thumb">
+        <div class="thumb-skeleton"></div>
+        <img src="${escAttr(thumbUrl)}" loading="lazy" alt="">
+      </div>
       <div class="card-header">
         <div class="card-icon">${getIcon(p.name)}</div>
         <div>
@@ -720,6 +756,12 @@ function render() {
         <button class="btn-edit" data-id="${p.id}">수정</button>
         <button class="btn-del"  data-id="${p.id}">삭제</button>
       </div>`;
+
+    const img = card.querySelector('.card-thumb img');
+    const skel = card.querySelector('.thumb-skeleton');
+    img.addEventListener('load', () => { img.classList.add('loaded'); skel.remove(); });
+    img.addEventListener('error', () => { card.querySelector('.card-thumb').remove(); });
+
     grid.appendChild(card);
   });
 }
